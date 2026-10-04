@@ -10,14 +10,19 @@ live_loop :drums, delay: 16 do
   sample :bd_tek;  sleep 0.5
 end
 
-live_loop :boom, delay: 16 do
-  sample :bd_sone, rate: 0.7, amp: 1.2, compress: 0
+live_loop :boom, delay: 32 do
+  sample :bd_sone, rate: 0.6, amp: 1.5, compress: 1
   sleep 4
 end
 
-live_loop :kiribati, delay: 24 do
-  synth :zawa, rate: [1, 1.25].ring.choose, amp: 0.25 if (spread 5,7).tick
-  sleep 0.25
+with_fx :reverb, mix:  0.4, room:  0.85 do
+  with_fx :ixi_techno do
+    live_loop :kiribati, delay: 24 do
+      synth [:pluck, :dtri].choose, release: [0.45, 0.85].ring.choose,
+      amp: 0.4 if (spread 8, 11).tick
+      sleep 0.25
+    end
+  end
 end
 
 with_fx :reverb, mix: 0.3, room: 0.5 do
@@ -50,24 +55,24 @@ end
 
 with_fx :reverb, mix: 0.4, room: 0.2 do
   with_fx :distortion, distort: 0.2 do
-    live_loop :ultrabass, delay: 24 do
-      use_transpose 0; tick;
-      dur = 2; a, b, c = 8*dur, 3*dur, 5*dur
+    live_loop :ultrabass, delay: 32 do
+      tick
+      use_transpose [-12, 0].choose
+      dur = 2 ; a, b, c = 8*dur, 3*dur, 5*dur
       bass_line = (knit :a2, a, :b2, b, :e2, c)
-      synth :fm, note: bass_line.look , divisor: 1, depth: 1, amp: 1,  
-      release: 1.0/4 + 0.075 if (spread 5,7, rotate: 2).look  
+      synth :fm, note: bass_line.look , divisor: 2, depth: 1, amp: 2,  
+      release: 1.0/(dur*2) + 0.075 if (spread 5,7, rotate: 1).look  
       sleep 1.0/(2*dur)
     end
   end
 end
 
 with_fx :reverb, mix: 0.4, room: 0.88 do
-
-  with_fx :bpf, centre: 118, pre_amp: 10 do
+  with_fx :bpf, centre: 100, pre_amp: 10 do
     live_loop  :piano do
       p = 1.0/3
       with_fx :ping_pong, mix: 0.1,  ## Mix for dry-wet signal
-      phase: p, feedback: 0.5, pan_start: rdist(0.5, 0), reps: 16 do
+      phase: p, feedback: 0.5, pan_start: rdist(0.9, 0), reps: 16 do
         a, b, c = (chord :a4, :minor, invert: 1),
         ([:b4, :e5, :a5]),
         (chord :e4, :minor, invert: 2)
@@ -76,7 +81,6 @@ with_fx :reverb, mix: 0.4, room: 0.88 do
         sustain: 0.1, attack: 0.01, decay: 0.00, amp: 2
         sleep 0.5
       end
-
     end
   end
 end
